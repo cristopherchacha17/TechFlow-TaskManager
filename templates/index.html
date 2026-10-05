@@ -13,16 +13,21 @@
         .btn { background: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
         .btn:hover { background: #218838; }
         .task-card { background: #fff; border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 5px; border-left: 5px solid #007bff; }
-        .task-meta { font-size: 0.9em; color: #666; margin-top: 5px; }
+        .task-meta { font-size: 0.9em; color: #666; margin-top: 8px; display: flex; gap: 10px; align-items: center; }
         .badge { display: inline-block; padding: 3px 7px; font-size: 0.8em; font-weight: bold; border-radius: 3px; color: white; }
         .badge-alta { background: #dc3545; } .badge-media { background: #ffc107; color: #212529; } .badge-baixa { background: #28a745; }
+        .edit-form { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; display: flex; gap: 5px; align-items: center; }
+        .edit-form select { width: auto; padding: 4px; font-size: 0.9em; }
+        .btn-inline { padding: 4px 8px; font-size: 0.85em; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .btn-delete { background: #dc3545; text-decoration: none; color: white; padding: 4px 8px; font-size: 0.85em; border-radius: 3px; float: right; }
+        .btn-delete:hover { background: #bd2130; }
     </style>
 </head>
 <body>
 
     <h1>=====================================<br>TECHFLOW TASKMANAGER<br>=====================================</h1>
 
-    <!-- Formulário de Cadastro (Issue 3) -->
+    <!-- Formulário de Cadastro -->
     <div class="box">
         <h3>[ + Nova tarefa ]</h3>
         <form action="/add" method="POST">
@@ -46,14 +51,38 @@
         </form>
     </div>
 
-    <!-- Lista de Tarefas (Issue 4) -->
+    <!-- Lista de Tarefas -->
     <h3>TAREFAS</h3>
     {% if tasks %}
         {% for task in tasks %}
             <div class="task-card">
-                <strong>{{ task[1] }}</strong> - <span class="badge badge-{{ task[4]|lower|replace('é','e') }}">{{ task[4] }}</span>
-                <p style="margin: 8px 0;">{{ task[2] }}</p>
-                <div class="task-meta">Status: <strong>{{ task[3] }}</strong></div>
+                <!-- Botão de Excluir mapeando para a coluna id de forma explícita -->
+                <a href="/delete/{{ task['id'] }}" class="btn-delete" onclick="return confirm('Deseja excluir esta tarefa?')">[Excluir]</a>
+                
+                <strong>{{ task['title'] }}</strong> - 
+                <span class="badge {% if task['priority'] == 'Alta' %}badge-alta{% elif task['priority'] == 'Média' %}badge-media{% else %}badge-baixa{% endif %}">
+                    {{ task['priority'] }}
+                </span>
+                
+                <p style="margin: 8px 0; color: #444;">{{ task['description'] }}</p>
+                <div class="task-meta">Status: <strong>{{ task['status'] }}</strong></div>
+
+                <!-- Formulário Inline de Edição mapeando para a coluna id de forma explícita -->
+                <form action="/update/{{ task['id'] }}" method="POST" class="edit-form">
+                    <select name="status">
+                        <option value="A Fazer" {% if task['status'] == 'A Fazer' %}selected{% endif %}>A Fazer</option>
+                        <option value="Em andamento" {% if task['status'] == 'Em andamento' %}selected{% endif %}>Em andamento</option>
+                        <option value="Concluído" {% if task['status'] == 'Concluído' %}selected{% endif %}>Concluído</option>
+                    </select>
+                    
+                    <select name="priority">
+                        <option value="Baixa" {% if task['priority'] == 'Baixa' %}selected{% endif %}>Baixa</option>
+                        <option value="Média" {% if task['priority'] == 'Média' %}selected{% endif %}>Média</option>
+                        <option value="Alta" {% if task['priority'] == 'Alta' %}selected{% endif %}>Alta</option>
+                    </select>
+                    
+                    <button type="submit" class="btn-inline">[Atualizar]</button>
+                </form>
             </div>
         {% endfor %}
     {% else %}

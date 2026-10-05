@@ -4,16 +4,16 @@ import os
 
 app = Flask(__name__, template_folder='../templates')
 
-# Caminho absoluto para encontrar o banco de dados correto
 DB_PATH = os.path.join(os.path.dirname(__file__), 'tasks.db')
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
+    # Adicionamos essa linha abaixo para conseguirmos acessar os dados pelo nome da coluna no HTML (ex: task['id'])
+    conn.row_factory = sqlite3.Row
     return conn
 
 @app.route("/")
 def home():
-    # R - Read: Listagem de tarefas (Issue 4)
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, title, description, status, priority FROM tasks ORDER BY id DESC")
@@ -23,11 +23,10 @@ def home():
 
 @app.route("/add", methods=["POST"])
 def add_task():
-    # C - Create: Cadastro de tarefas (Issue 3)
     title = request.form.get("title")
     description = request.form.get("description")
     priority = request.form.get("priority")
-    status = "A Fazer"  # Toda tarefa nova começa como 'A Fazer'
+    status = "A Fazer"
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -35,6 +34,30 @@ def add_task():
         "INSERT INTO tasks (title, description, status, priority) VALUES (?, ?, ?, ?)",
         (title, description, status, priority)
     )
+    conn.commit()
+    conn.close()
+    return redirect("/")
+
+@app.route("/update/<int:id>", methods=["POST"])
+def update_task(id):
+    status = request.form.get("status")
+    priority = request.form.get("priority")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE tasks SET status = ?, priority = ? WHERE id = ?",
+        (status, priority, id)
+    )
+    conn.commit()
+    conn.close()
+    return redirect("/")
+
+@app.route("/delete/<int:id>")
+def delete_task(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM tasks WHERE id = ?", (id,))
     conn.commit()
     conn.close()
     return redirect("/")
