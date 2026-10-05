@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>TechFlow TaskManager</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background-color: #f4f4f9; }
+        h1 { text-align: center; color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn { background: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        .btn:hover { background: #218838; }
+        .task-card { background: #fff; border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 5px; border-left: 5px solid #007bff; }
+        .task-meta { font-size: 0.9em; color: #666; margin-top: 5px; }
+        .badge { display: inline-block; padding: 3px 7px; font-size: 0.8em; font-weight: bold; border-radius: 3px; color: white; }
+        .badge-alta { background: #dc3545; } .badge-media { background: #ffc107; color: #212529; } .badge-baixa { background: #28a745; }
+    </style>
+</head>
+<body>
+
+    <h1>=====================================<br>TECHFLOW TASKMANAGER<br>=====================================</h1>
+
+    <!-- Formulário de Cadastro (Issue 3) -->
+    <div class="box">
+        <h3>[ + Nova tarefa ]</h3>
+        <form action="/add" method="POST">
+            <div class="form-group">
+                <label>Título:</label>
+                <input type="text" name="title" required placeholder="Ex: Criar documentação">
+            </div>
+            <div class="form-group">
+                <label>Descrição:</label>
+                <textarea name="description" rows="3" placeholder="Ex: Detalhar os requisitos do sistema..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Prioridade:</label>
+                <select name="priority">
+                    <option value="Baixa">Baixa</option>
+                    <option value="Média">Média</option>
+                    <option value="Alta">Alta</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Salvar Tarefa</button>
+        </form>
+    </div>
+
+    <!-- Lista de Tarefas (Issue 4) -->
+    <h3>TAREFAS</h3>
+    {% if tasks %}
+        {% for task in tasks %}
+            <div class="task-card">
+                <strong>{{ task[1] }}</strong> - <span class="badge badge-{{ task[4]|lower|replace('é','e') }}">{{ task[4] }}</span>
+                <p style="margin: 8px 0;">{{ task[2] }}</p>
+                <div class="task-meta">Status: <strong>{{ task[3] }}</strong></div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Nenhuma tarefa cadastrada ainda.</p>
+    {% endif %}
+
+</body>
+</html>
